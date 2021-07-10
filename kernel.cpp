@@ -1,8 +1,9 @@
 #include "types.h"
 #include "gdt.h"
+#include "interrupts.h"
 
 
-void printsf(char* str)
+void printsf(const char* str)
 {
     static uint16_t* VideoMemory = (uint16_t*)0xb8000;
 
@@ -41,21 +42,22 @@ void printsf(char* str)
 
 
 typedef void (*constructor)();
-extern constructor start_ctors;
-extern constructor end_ctors;
-extern void callConstructors()
+extern "C" constructor start_ctors;
+extern "C" constructor end_ctors;
+extern "C" void callConstructors()
 {
-  for(constructor* i = &start_ctors; i !=&end_ctors; ++i){
-    (*i)();
-  }
-
+    for(constructor* i = &start_ctors; i != &end_ctors; i++)
+        (*i)();
 }
 
-
-extern void kernelMain(void* multiboot_structure, uint32_t magicnumber){
+extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber){
 
     printsf("Geeseseqweqweqeqw\n");
     printsf("Geeseseqweqweqeqw------------------------------;llhbkbkgkjhkkhj");
-    gdt_install();
+    GlobalDescriptorTable gdt;
+  InterruptManager interrupts(&gdt);
+  interrupts.Activate();
+
+
     while (1);
 }
