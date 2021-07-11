@@ -58,7 +58,7 @@ picSlaveData(0xA1)
   SetInterruptDescriptorTableEntry(0x20, codeSegment, &HandleInterruptRequest0x00, 0, IDT_INTERRUPT_GATE );
   SetInterruptDescriptorTableEntry(0x21, codeSegment, &HandleInterruptRequest0x01, 0, IDT_INTERRUPT_GATE );
 
-
+  SetInterruptDescriptorTableEntry(0x2C, codeSegment, &HandleInterruptRequest0x01, 0, IDT_INTERRUPT_GATE );
 
   picMasterCommand.Write(0x11);
   picSlaveCommand.Write(0x11);
