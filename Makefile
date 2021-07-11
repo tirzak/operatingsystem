@@ -4,7 +4,7 @@ LDPARAMS = -melf_i386
 GPPPARAMS = -m32 -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore
 
 
-objects = loader.o gdt.o interruptstubs.o interrupts.o port.o kernel.o
+objects = loader.o gdt.o interruptstubs.o interrupts.o port.o keyboard.o kernel.o
 
 %.o: %.cpp
 	gcc $(GPPPARAMS) -c -o $@ $<

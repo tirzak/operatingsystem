@@ -1,7 +1,7 @@
 #include "types.h"
 #include "gdt.h"
 #include "interrupts.h"
-
+#include "keyboard.h"
 
 void printsf(const char* str)
 {
@@ -56,6 +56,7 @@ extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber){
     printsf("Geeseseqweqweqeqw------------------------------;llhbkbkgkjhkkhj");
     GlobalDescriptorTable gdt;
   InterruptManager interrupts(&gdt);
+  KeyboardDriver keyboard(&interrupts);
   interrupts.Activate();
 
 
