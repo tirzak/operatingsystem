@@ -18,7 +18,7 @@ KeyboardDriver::~KeyboardDriver(){}
 void printsf(const char *);
 uint32_t KeyboardDriver::HandleInterrupt(uint32_t esp){
   uint8_t key = dataport.Read();
-  if (key < 0x80){
+
 switch (key) {
   case 0xFA: break;
   case 0x45: case 0xC5: break;
@@ -75,7 +75,7 @@ switch (key) {
     printsf(foo);
     break;
 }
-}
+
 
 
 return esp;

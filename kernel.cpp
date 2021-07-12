@@ -53,10 +53,9 @@ extern "C" void callConstructors()
 
 extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber){
 
-    printsf("Geeseseqweqweqeqw\n");
-    printsf("Geeseseqweqweqeqw------------------------------;llhbkbkgkjhkkhj");
+    printsf("Geeseseqweqweqeqw");
     GlobalDescriptorTable gdt;
-  InterruptManager interrupts(&gdt);
+  InterruptManager interrupts(0x20,&gdt);
   KeyboardDriver keyboard(&interrupts);
   MouseDriver mouse(&interrupts);
   interrupts.Activate();
