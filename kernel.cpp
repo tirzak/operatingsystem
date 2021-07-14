@@ -3,6 +3,7 @@
 #include "interrupts.h"
 #include "keyboard.h"
 #include "mouse.h"
+#include "driver.h"
 
 void printsf(const char* str)
 {
@@ -41,6 +42,26 @@ void printsf(const char* str)
     }
 }
 
+void printHex(uint8_t key){
+
+  char foo[] = "0x00";
+  char hex[] = "0123456789ABCDEF";
+  foo[0] = hex[(key >> 4) &0xF];
+  foo[1] = hex[key & 0x0F];
+  printsf(foo);
+}
+
+class PrintsfKeyboardEventHandlere : public KeyBoardEventHandler{
+public:
+  void OnKeyDown(char c)
+  {
+     char foo[]= " ";
+     foo[0] = c;
+
+    printsf(foo);
+  }
+
+};
 
 typedef void (*constructor)();
 extern "C" constructor start_ctors;
@@ -53,11 +74,23 @@ extern "C" void callConstructors()
 
 extern "C" void kernelMain(void* multiboot_structure, uint32_t magicnumber){
 
-    printsf("Geeseseqweqweqeqw");
+    printsf("Geeseseqweqweqeqw\n");
     GlobalDescriptorTable gdt;
   InterruptManager interrupts(0x20,&gdt);
-  KeyboardDriver keyboard(&interrupts);
+
+
+  printsf("Initializing Hardware, Stage 1\n");
+
+  DriverManager drvManager;
+  PrintsfKeyboardEventHandlere kbhandler;
+  KeyboardDriver keyboard(&interrupts, &kbhandler);
+
+  drvManager.AddDriver(&keyboard);
   MouseDriver mouse(&interrupts);
+    drvManager.AddDriver(&mouse);
+      printsf("Initializing Hardware, Stage 2\n");
+    drvManager.ActivateAll();
+  printsf("Initializing Hardware, Stage 3\n");
   interrupts.Activate();
 
 

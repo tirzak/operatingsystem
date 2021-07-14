@@ -1,10 +1,28 @@
 #include "keyboard.h"
 
 
-KeyboardDriver::KeyboardDriver(InterruptManager* manager): InterruptHandler(0x21, manager),
+
+KeyBoardEventHandler::KeyBoardEventHandler(){
+
+}
+void KeyBoardEventHandler::OnKeyDown(char){
+
+}
+void KeyBoardEventHandler::OnKeyUp(char){
+
+}
+
+KeyboardDriver::KeyboardDriver(InterruptManager* manager, KeyBoardEventHandler *handler): InterruptHandler(0x21, manager),
 dataport(0x60),
 commandPort(0x64)
 {
+this->handler=handler;
+}
+KeyboardDriver::~KeyboardDriver(){}
+void printsf(const char *);
+void printHex(uint8_t key);
+
+void KeyboardDriver::Activate(){
   while(commandPort.Read()&0x1)
     dataport.Read();
   commandPort.Write(0xAE); // PIC sends interrupt
@@ -14,65 +32,63 @@ commandPort(0x64)
   dataport.Write(status);
   dataport.Write(0xF4);
 }
-KeyboardDriver::~KeyboardDriver(){}
-void printsf(const char *);
 uint32_t KeyboardDriver::HandleInterrupt(uint32_t esp){
   uint8_t key = dataport.Read();
+
+  if(handler == 0)
+    return esp;
 
 switch (key) {
   case 0xFA: break;
   case 0x45: case 0xC5: break;
-  case 0x02: printsf("1"); break;
-     case 0x03: printsf("2"); break;
-     case 0x04: printsf("3"); break;
-     case 0x05: printsf("4"); break;
-     case 0x06: printsf("5"); break;
-     case 0x07: printsf("6"); break;
-     case 0x08: printsf("7"); break;
-     case 0x09: printsf("8"); break;
-     case 0x0A: printsf("9"); break;
-     case 0x0B: printsf("0"); break;
+  case 0x02: handler->OnKeyDown('1'); break;
+     case 0x03: handler->OnKeyDown('2'); break;
+     case 0x04: handler->OnKeyDown('3'); break;
+     case 0x05: handler->OnKeyDown('4'); break;
+     case 0x06: handler->OnKeyDown('5'); break;
+     case 0x07: handler->OnKeyDown('6'); break;
+     case 0x08: handler->OnKeyDown('7'); break;
+     case 0x09: handler->OnKeyDown('8'); break;
+     case 0x0A: handler->OnKeyDown('9'); break;
+     case 0x0B: handler->OnKeyDown('0'); break;
 
-     case 0x10: printsf("q"); break;
-     case 0x11: printsf("w"); break;
-     case 0x12: printsf("e"); break;
-     case 0x13: printsf("r"); break;
-     case 0x14: printsf("t"); break;
-     case 0x15: printsf("z"); break;
-     case 0x16: printsf("u"); break;
-     case 0x17: printsf("i"); break;
-     case 0x18: printsf("o"); break;
-     case 0x19: printsf("p"); break;
+     case 0x10: handler->OnKeyDown('q'); break;
+     case 0x11: handler->OnKeyDown('w'); break;
+     case 0x12: handler->OnKeyDown('e'); break;
+     case 0x13: handler->OnKeyDown('r'); break;
+     case 0x14: handler->OnKeyDown('t'); break;
+     case 0x15: handler->OnKeyDown('z'); break;
+     case 0x16: handler->OnKeyDown('u'); break;
+     case 0x17: handler->OnKeyDown('i'); break;
+     case 0x18: handler->OnKeyDown('o'); break;
+     case 0x19: handler->OnKeyDown('p'); break;
 
-     case 0x1E: printsf("a"); break;
-     case 0x1F: printsf("s"); break;
-     case 0x20: printsf("d"); break;
-     case 0x21: printsf("f"); break;
-     case 0x22: printsf("g"); break;
-     case 0x23: printsf("h"); break;
-     case 0x24: printsf("j"); break;
-     case 0x25: printsf("k"); break;
-     case 0x26: printsf("l"); break;
+     case 0x1E: handler->OnKeyDown('a'); break;
+     case 0x1F: handler->OnKeyDown('s'); break;
+     case 0x20: handler->OnKeyDown('d'); break;
+     case 0x21: handler->OnKeyDown('f'); break;
+     case 0x22: handler->OnKeyDown('g'); break;
+     case 0x23: handler->OnKeyDown('h'); break;
+     case 0x24: handler->OnKeyDown('j'); break;
+     case 0x25: handler->OnKeyDown('k'); break;
+     case 0x26: handler->OnKeyDown('l'); break;
 
-     case 0x2C: printsf("y"); break;
-     case 0x2D: printsf("x"); break;
-     case 0x2E: printsf("c"); break;
-     case 0x2F: printsf("v"); break;
-     case 0x30: printsf("b"); break;
-     case 0x31: printsf("n"); break;
-     case 0x32: printsf("m"); break;
-     case 0x33: printsf(","); break;
-     case 0x34: printsf("."); break;
-     case 0x35: printsf("-"); break;
+     case 0x2C: handler->OnKeyDown('y'); break;
+     case 0x2D: handler->OnKeyDown('x'); break;
+     case 0x2E: handler->OnKeyDown('c'); break;
+     case 0x2F: handler->OnKeyDown('v'); break;
+     case 0x30: handler->OnKeyDown('b'); break;
+     case 0x31: handler->OnKeyDown('n'); break;
+     case 0x32: handler->OnKeyDown('m'); break;
+     case 0x33: handler->OnKeyDown(','); break;
+     case 0x34: handler->OnKeyDown('.'); break;
+     case 0x35: handler->OnKeyDown('-'); break;
 
-     case 0x1C: printsf("\n"); break;
-     case 0x39: printsf(" "); break;
+     case 0x1C: handler->OnKeyDown('\n'); break;
+     case 0x39: handler->OnKeyDown(' '); break;
   default:
-    char foo[] = "KEYBOARD 0x00";
-    char hex[] = "0123456789ABCDEF";
-    foo[11] = hex[(key >> 4) &0xF];
-    foo[12] = hex[key & 0x0F];
-    printsf(foo);
+    printsf("KEYBOARD 0x");
+    printHex(key);
     break;
 }
 

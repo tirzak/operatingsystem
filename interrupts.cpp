@@ -3,7 +3,7 @@
 
 void printsf(const char* str);
 
-
+void printHex(uint8_t key);
 InterruptHandler::InterruptHandler(uint8_t interruptNumber,InterruptManager* interruptManager){
   this->interruptNumber = interruptNumber;
   this-> interruptManager = interruptManager;
@@ -155,11 +155,8 @@ uint32_t InterruptManager::DohandleInterrupt(uint8_t interruptNumber, uint32_t e
     esp = handlers[interruptNumber]->HandleInterrupt(esp);
   }
   else if(interruptNumber !=0x20){
-      char foo[] = "UNHANDLED INTERRUPT 0x00";
-      char hex[] = "0123456789ABCDEF";
-    foo[22] = hex[(interruptNumber >> 4) &0xF];
-    foo[23] = hex[interruptNumber & 0x0F];
-    printsf(foo);
+    printsf("UNHANDLED INTERRUPT 0x");
+    printHex(interruptNumber);
   }
 
 
